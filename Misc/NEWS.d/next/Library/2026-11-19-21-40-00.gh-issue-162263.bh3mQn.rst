@@ -1,0 +1,2 @@
+Fix :mod:`urllib.robotparser` splitting a group when a ``Crawl-delay`` or
+``Request-rate`` directive appears between its ``User-agent`` lines.

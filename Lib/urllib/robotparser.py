@@ -152,7 +152,6 @@ class RobotFileParser:
                         # it will crash
                         if line[1].strip().isdecimal():
                             entry.delay = int(line[1])
-                        state = 2
                 elif line[0] == "request-rate":
                     if state != 0:
                         numbers = line[1].split('/')
@@ -160,7 +159,6 @@ class RobotFileParser:
                         if (len(numbers) == 2 and numbers[0].strip().isdecimal()
                             and numbers[1].strip().isdecimal()):
                             entry.req_rate = RequestRate(int(numbers[0]), int(numbers[1]))
-                        state = 2
                 elif line[0] == "sitemap":
                     # According to http://www.sitemaps.org/protocol.html
                     # "This directive is independent of the user-agent line,

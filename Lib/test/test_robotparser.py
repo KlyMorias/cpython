@@ -399,6 +399,39 @@ User-agent: eggsbot
 Disallow: /another/path\
 """
 
+class ExtensionDirectivesKeepGroupTest(unittest.TestCase):
+    def test_extension_between_user_agents(self):
+        cases = (
+            ('Crawl-delay: 10', 'crawl_delay', 10),
+            ('Request-rate: 2/30', 'request_rate', (2, 30)),
+        )
+        for directive, method, expected in cases:
+            with self.subTest(directive=directive):
+                parser = urllib.robotparser.RobotFileParser()
+                parser.parse([
+                    'User-agent: spambot',
+                    directive,
+                    'User-agent: eggsbot',
+                    'Disallow: /private',
+                ])
+                for agent in ('spambot', 'eggsbot'):
+                    self.assertFalse(parser.can_fetch(agent, '/private'))
+                    self.assertTrue(parser.can_fetch(agent, '/public'))
+                    self.assertEqual(getattr(parser, method)(agent), expected)
+
+    def test_extension_only_group(self):
+        cases = (
+            ('Crawl-delay: 10', 'crawl_delay', 10),
+            ('Request-rate: 2/30', 'request_rate', (2, 30)),
+        )
+        for directive, method, expected in cases:
+            with self.subTest(directive=directive):
+                parser = urllib.robotparser.RobotFileParser()
+                parser.parse(['User-agent: spambot', directive])
+                self.assertTrue(parser.can_fetch('spambot', '/'))
+                self.assertEqual(getattr(parser, method)('spambot'), expected)
+
+
 class IgnoreEmptyLinesTest(BaseRobotTest, unittest.TestCase):
     robots_txt = """\
 User-agent: spambot
